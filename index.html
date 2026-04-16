@@ -18,11 +18,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .btn-primary:hover { background: #162d4a; }
 .btn-secondary { background: #e5e7eb; color: #374151; }
 .btn-success { background: #059669; color: white; }
-.btn-danger { background: #dc2626; color: white; }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
 input, textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-family: inherit; }
 input:focus, textarea:focus { outline: none; border-color: #1e3a5f; }
-textarea { resize: vertical; min-height: 120px; margin-top: 8px; }
+textarea { resize: vertical; }
 .msg { font-size: 12px; margin-top: 6px; }
 .ok { color: #059669; } .err { color: #dc2626; }
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #1e3a5f; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
@@ -30,8 +29,9 @@ textarea { resize: vertical; min-height: 120px; margin-top: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 #login-view { text-align: center; padding: 60px 20px; }
 #login-view p { color: #6b7280; font-size: 14px; margin: 12px 0 24px; }
+#api-bar { display: none; padding: 12px 16px; }
+#memory-panel { display: none; }
 #main-view { display: none; }
-.api-bar { padding: 12px 16px; display: none; }
 .api-bar-inner { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .email-draft-item { border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
 .email-draft-header { padding: 14px 16px; background: #f9fafb; display: flex; justify-content: space-between; align-items: flex-start; cursor: pointer; }
@@ -77,7 +77,7 @@ textarea { resize: vertical; min-height: 120px; margin-top: 8px; }
   </div>
 
   <!-- API KEY BAR -->
-  <div class="card api-bar" id="api-bar">
+  <div class="card" id="api-bar">
     <div class="api-bar-inner">
       <label style="font-size:13px;font-weight:600">🔑 Anthropic API Key:</label>
       <input type="password" id="api-key-input" placeholder="sk-ant-..." style="flex:1;min-width:200px;" />
@@ -88,7 +88,7 @@ textarea { resize: vertical; min-height: 120px; margin-top: 8px; }
   </div>
 
   <!-- MEMORY PANEL -->
-  <div class="card" id="memory-panel" style="display:none">
+  <div class="card" id="memory-panel">
     <div style="font-size:14px;font-weight:700;margin-bottom:6px">🧠 My Info — Claude uses this when drafting every reply</div>
     <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Add anything: gym hours, pricing, programs, policies, tone preferences, FAQs. The more detail, the better the drafts.</p>
     <textarea id="memory-text" rows="10" placeholder="Example:
@@ -100,10 +100,10 @@ textarea { resize: vertical; min-height: 120px; margin-top: 8px; }
 - Membership pause: up to 3 months/year
 - Always be warm and welcoming
 - Never offer discounts without manager approval"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px">
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
       <button class="btn btn-primary btn-sm" onclick="saveMemory()">💾 Save Info</button>
       <button class="btn btn-secondary btn-sm" onclick="toggleMemory()">Close</button>
-      <span id="memory-msg" class="msg" style="align-self:center"></span>
+      <span id="memory-msg" class="msg"></span>
     </div>
   </div>
 
@@ -139,7 +139,7 @@ const SCOPES = 'Mail.Read Mail.ReadWrite';
 const GRAPH = 'https://graph.microsoft.com/v1.0';
 let token = null;
 let emails = [];
-let drafts = {}; // id -> {text, status}
+let drafts = {};
 
 function signIn() {
   const p = new URLSearchParams({
@@ -147,7 +147,7 @@ function signIn() {
     redirect_uri: REDIRECT_URI, scope: SCOPES,
     response_mode: 'fragment', prompt: 'select_account'
   });
-  window.location.href = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/authorize?${p}`;
+  window.location.href = 'https://login.microsoftonline.com/' + TENANT_ID + '/oauth2/v2.0/authorize?' + p;
 }
 
 function signOut() {
@@ -156,6 +156,7 @@ function signOut() {
   document.getElementById('login-view').style.display = 'block';
   document.getElementById('main-view').style.display = 'none';
   document.getElementById('api-bar').style.display = 'none';
+  document.getElementById('memory-panel').style.display = 'none';
   document.getElementById('signout').style.display = 'none';
   document.getElementById('user-bar').textContent = '';
 }
@@ -167,7 +168,8 @@ function handleRedirect() {
     token = t;
     sessionStorage.setItem('ms_token', t);
     history.replaceState(null, '', window.location.pathname);
-    showMain(); return;
+    showMain();
+    return;
   }
   const saved = sessionStorage.getItem('ms_token');
   if (saved) { token = saved; showMain(); }
@@ -178,16 +180,24 @@ async function showMain() {
   document.getElementById('main-view').style.display = 'block';
   document.getElementById('api-bar').style.display = 'block';
   document.getElementById('signout').style.display = 'inline-block';
-  const saved = sessionStorage.getItem('anthropic_key');
-  if (saved) {
+  const savedKey = sessionStorage.getItem('anthropic_key');
+  if (savedKey) {
     document.getElementById('api-key-msg').innerHTML = '<span class="ok">✅ API key loaded</span>';
   }
   try {
-    const r = await fetch(`${GRAPH}/me`, { headers: { Authorization: `Bearer ${token}` } });
+    const r = await fetch(GRAPH + '/me', { headers: { Authorization: 'Bearer ' + token } });
     const u = await r.json();
     document.getElementById('user-bar').textContent = u.displayName || u.mail || '';
   } catch(e) {}
   loadAndDraftAll();
+}
+
+function saveApiKey() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (!k) return;
+  sessionStorage.setItem('anthropic_key', k);
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-key-msg').innerHTML = '<span class="ok">✅ Saved!</span>';
 }
 
 function toggleMemory() {
@@ -204,13 +214,7 @@ function saveMemory() {
   const val = document.getElementById('memory-text').value.trim();
   localStorage.setItem('gym_memory', val);
   document.getElementById('memory-msg').innerHTML = '<span class="ok">✅ Saved!</span>';
-  setTimeout(() => document.getElementById('memory-msg').innerHTML = '', 2000);
-}
-  const k = document.getElementById('api-key-input').value.trim();
-  if (!k) return;
-  sessionStorage.setItem('anthropic_key', k);
-  document.getElementById('api-key-input').value = '';
-  document.getElementById('api-key-msg').innerHTML = '<span class="ok">✅ Saved!</span>';
+  setTimeout(function() { document.getElementById('memory-msg').innerHTML = ''; }, 2000);
 }
 
 async function loadAndDraftAll() {
@@ -220,63 +224,56 @@ async function loadAndDraftAll() {
   document.getElementById('progress-wrap').style.display = 'none';
   document.getElementById('summary-line').textContent = '';
   document.getElementById('count-badge').style.display = 'none';
-
   try {
-    const r = await fetch(`${GRAPH}/me/mailFolders/inbox/messages?$top=20&$filter=isRead eq false&$select=id,subject,from,receivedDateTime,bodyPreview,body,isRead&$orderby=receivedDateTime desc`, {
-      headers: { Authorization: `Bearer ${token}` }
+    const r = await fetch(GRAPH + '/me/mailFolders/inbox/messages?$top=20&$filter=isRead eq false&$select=id,subject,from,receivedDateTime,bodyPreview,body,isRead&$orderby=receivedDateTime desc', {
+      headers: { Authorization: 'Bearer ' + token }
     });
     const d = await r.json();
     if (d.error) throw new Error(d.error.message);
     emails = d.value || [];
-
     if (!emails.length) {
       document.getElementById('drafts-list').innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af"><div style="font-size:32px;margin-bottom:10px">🎉</div>No unread emails!</div>';
       document.getElementById('summary-line').textContent = 'All caught up!';
       return;
     }
-
-    document.getElementById('count-badge').textContent = `${emails.length} unread`;
+    document.getElementById('count-badge').textContent = emails.length + ' unread';
     document.getElementById('count-badge').style.display = 'inline-block';
-    document.getElementById('summary-line').textContent = `Generating drafts for ${emails.length} unread email${emails.length>1?'s':''}…`;
-
-    // render all cards as pending
+    document.getElementById('summary-line').textContent = 'Generating drafts for ' + emails.length + ' unread email' + (emails.length > 1 ? 's' : '') + '…';
     renderAllCards();
-
-    // start drafting all
     await draftAll();
-
   } catch(e) {
-    document.getElementById('drafts-list').innerHTML = `<div class="err" style="padding:16px">Error: ${e.message}</div>`;
+    document.getElementById('drafts-list').innerHTML = '<div class="err" style="padding:16px">Error: ' + e.message + '</div>';
   }
 }
 
 function renderAllCards() {
-  document.getElementById('drafts-list').innerHTML = emails.map(e => `
-    <div class="email-draft-item" id="item-${e.id}">
-      <div class="email-draft-header" onclick="toggleBody('${e.id}')">
-        <div class="email-meta">
-          <div class="email-sender">${esc(e.from?.emailAddress?.name||e.from?.emailAddress?.address||'?')}</div>
-          <div class="email-subject">${esc(e.subject||'(no subject)')}</div>
-          <div class="email-preview">${esc(e.bodyPreview||'')}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <span class="email-date">${fmtDate(e.receivedDateTime)}</span>
-          <span class="draft-status status-pending" id="status-${e.id}">⏳ Pending</span>
-        </div>
-      </div>
-      <div class="draft-body" id="body-${e.id}">
-        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Original Email</div>
-        <div class="original-body" id="orig-${e.id}"></div>
-        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;margin-top:12px">✍️ Draft Reply</div>
-        <textarea id="draft-${e.id}" placeholder="Generating…"></textarea>
-        <div class="draft-actions">
-          <button class="btn btn-success btn-sm" onclick="saveSingleDraft('${e.id}')">💾 Save to Drafts</button>
-          <button class="btn btn-secondary btn-sm" onclick="copySingle('${e.id}')">📋 Copy</button>
-          <button class="btn btn-primary btn-sm" onclick="regenerate('${e.id}')">↻ Regenerate</button>
-        </div>
-        <div id="save-msg-${e.id}" class="msg"></div>
-      </div>
-    </div>`).join('');
+  document.getElementById('drafts-list').innerHTML = emails.map(function(e) {
+    return '<div class="email-draft-item" id="item-' + e.id + '">' +
+      '<div class="email-draft-header" onclick="toggleBody(\'' + e.id + '\')">' +
+        '<div class="email-meta">' +
+          '<div class="email-sender">' + esc(e.from && e.from.emailAddress ? (e.from.emailAddress.name || e.from.emailAddress.address) : '?') + '</div>' +
+          '<div class="email-subject">' + esc(e.subject || '(no subject)') + '</div>' +
+          '<div class="email-preview">' + esc(e.bodyPreview || '') + '</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' +
+          '<span class="email-date">' + fmtDate(e.receivedDateTime) + '</span>' +
+          '<span class="draft-status status-pending" id="status-' + e.id + '">⏳ Pending</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="draft-body" id="body-' + e.id + '">' +
+        '<div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Original Email</div>' +
+        '<div class="original-body" id="orig-' + e.id + '"></div>' +
+        '<div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;margin-top:12px">✍️ Draft Reply</div>' +
+        '<textarea id="draft-' + e.id + '" rows="6" placeholder="Generating…"></textarea>' +
+        '<div class="draft-actions">' +
+          '<button class="btn btn-success btn-sm" onclick="saveSingleDraft(\'' + e.id + '\')">💾 Save to Drafts</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="copySingle(\'' + e.id + '\')">📋 Copy</button>' +
+          '<button class="btn btn-primary btn-sm" onclick="regenerate(\'' + e.id + '\')">↻ Regenerate</button>' +
+        '</div>' +
+        '<div id="save-msg-' + e.id + '" class="msg"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
 
 async function draftAll() {
@@ -285,39 +282,40 @@ async function draftAll() {
     document.getElementById('summary-line').innerHTML = '<span class="err">⚠️ Please enter your Anthropic API key above first.</span>';
     return;
   }
-
   document.getElementById('progress-wrap').style.display = 'block';
-  let done = 0;
-
-  for (const email of emails) {
+  var done = 0;
+  for (var i = 0; i < emails.length; i++) {
+    var email = emails[i];
     setStatus(email.id, 'writing', '✍️ Writing…');
-    const body = email.body?.contentType==='html' ? stripHtml(email.body.content) : (email.body?.content||email.bodyPreview||'');
-    document.getElementById(`orig-${email.id}`).textContent = body;
-
+    var body = email.body && email.body.contentType === 'html' ? stripHtml(email.body.content) : (email.body && email.body.content ? email.body.content : email.bodyPreview || '');
+    var origEl = document.getElementById('orig-' + email.id);
+    if (origEl) origEl.textContent = body;
     try {
-      const text = await callClaude(apiKey, email, body);
-      document.getElementById(`draft-${email.id}`).value = text;
-      drafts[email.id] = { text, saved: false };
+      var text = await callClaude(apiKey, email, body);
+      var ta = document.getElementById('draft-' + email.id);
+      if (ta) ta.value = text;
+      drafts[email.id] = { text: text, saved: false };
       setStatus(email.id, 'ready', '✅ Ready');
     } catch(e) {
       setStatus(email.id, 'error', '❌ Error');
-      document.getElementById(`draft-${email.id}`).value = 'Error generating draft: ' + e.message;
+      var ta2 = document.getElementById('draft-' + email.id);
+      if (ta2) ta2.value = 'Error: ' + e.message;
     }
-
     done++;
-    const pct = Math.round((done/emails.length)*100);
+    var pct = Math.round((done / emails.length) * 100);
     document.getElementById('progress-bar').style.width = pct + '%';
-    document.getElementById('progress-label').textContent = `${done} of ${emails.length} drafted`;
+    document.getElementById('progress-label').textContent = done + ' of ' + emails.length + ' drafted';
   }
-
-  document.getElementById('summary-line').textContent = `${emails.length} draft${emails.length>1?'s':''} ready — review and save!`;
+  document.getElementById('summary-line').textContent = emails.length + ' draft' + (emails.length > 1 ? 's' : '') + ' ready — review and save!';
   document.getElementById('save-all-btn').style.display = 'inline-block';
 }
 
 async function callClaude(apiKey, email, body) {
-  const memory = localStorage.getItem('gym_memory') || '';
-  const memoryBlock = memory ? `\n\nContext about Alliance BJJ Vancouver (use this to answer accurately):\n${memory}` : '';
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  var memory = localStorage.getItem('gym_memory') || '';
+  var memoryBlock = memory ? '\n\nContext about Alliance BJJ Vancouver (use this to answer accurately):\n' + memory : '';
+  var fromName = email.from && email.from.emailAddress ? (email.from.emailAddress.name || '') : '';
+  var fromAddr = email.from && email.from.emailAddress ? (email.from.emailAddress.address || '') : '';
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -328,73 +326,84 @@ async function callClaude(apiKey, email, body) {
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
       max_tokens: 1000,
-      messages: [{ role: 'user', content: `Draft a professional, friendly email reply on behalf of Sergio Rubio Landero, General Manager of Alliance Jiu Jitsu Vancouver, Canada. Be concise. Write only the email body — no subject or headers. Sign off as Sergio.${memoryBlock}\n\nFrom: ${email.from?.emailAddress?.name||''} <${email.from?.emailAddress?.address||''}>\nSubject: ${email.subject||''}\nMessage:\n${body}\n\nWrite the reply:` }]
+      messages: [{
+        role: 'user',
+        content: 'Draft a professional, friendly email reply on behalf of Sergio Rubio Landero, General Manager of Alliance Jiu Jitsu Vancouver, Canada. Be concise. Write only the email body — no subject or headers. Sign off as Sergio.' + memoryBlock + '\n\nFrom: ' + fromName + ' <' + fromAddr + '>\nSubject: ' + (email.subject || '') + '\nMessage:\n' + body + '\n\nWrite the reply:'
+      }]
     })
   });
-  const data = await res.json();
+  var data = await res.json();
   if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-  return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+  return (data.content || []).filter(function(b) { return b.type === 'text'; }).map(function(b) { return b.text; }).join('').trim();
 }
 
 async function saveAllDrafts() {
-  let saved = 0;
-  for (const email of emails) {
-    const text = document.getElementById(`draft-${email.id}`)?.value?.trim();
-    if (!text || drafts[email.id]?.saved) continue;
+  var saved = 0;
+  for (var i = 0; i < emails.length; i++) {
+    var email = emails[i];
+    var ta = document.getElementById('draft-' + email.id);
+    var text = ta ? ta.value.trim() : '';
+    if (!text || (drafts[email.id] && drafts[email.id].saved)) continue;
     try {
       await saveToOutlook(email, text);
-      drafts[email.id].saved = true;
+      drafts[email.id] = { saved: true };
       setStatus(email.id, 'saved', '💾 Saved');
       saved++;
     } catch(e) {
       setStatus(email.id, 'error', '❌ Error');
     }
   }
-  document.getElementById('summary-line').textContent = `✅ ${saved} draft${saved!==1?'s':''} saved to your Outlook Drafts folder!`;
+  document.getElementById('summary-line').textContent = '✅ ' + saved + ' draft' + (saved !== 1 ? 's' : '') + ' saved to your Outlook Drafts folder!';
 }
 
 async function saveSingleDraft(id) {
-  const email = emails.find(e=>e.id===id);
-  const text = document.getElementById(`draft-${id}`)?.value?.trim();
-  const msg = document.getElementById(`save-msg-${id}`);
-  if (!text) { msg.innerHTML = '<span class="err">Draft is empty.</span>'; return; }
-  msg.innerHTML = '<span style="color:#6b7280">Saving…</span>';
+  var email = null;
+  for (var i = 0; i < emails.length; i++) { if (emails[i].id === id) { email = emails[i]; break; } }
+  var ta = document.getElementById('draft-' + id);
+  var text = ta ? ta.value.trim() : '';
+  var msg = document.getElementById('save-msg-' + id);
+  if (!text) { if (msg) msg.innerHTML = '<span class="err">Draft is empty.</span>'; return; }
+  if (msg) msg.innerHTML = '<span style="color:#6b7280">Saving…</span>';
   try {
     await saveToOutlook(email, text);
-    drafts[id] = { ...(drafts[id]||{}), saved: true };
+    drafts[id] = { saved: true };
     setStatus(id, 'saved', '💾 Saved');
-    msg.innerHTML = '<span class="ok">✅ Saved to Outlook Drafts!</span>';
+    if (msg) msg.innerHTML = '<span class="ok">✅ Saved to Outlook Drafts!</span>';
   } catch(e) {
-    msg.innerHTML = `<span class="err">Error: ${e.message}</span>`;
+    if (msg) msg.innerHTML = '<span class="err">Error: ' + e.message + '</span>';
   }
 }
 
 async function saveToOutlook(email, text) {
-  const r = await fetch(`${GRAPH}/me/messages`, {
+  var toAddr = email.from && email.from.emailAddress ? email.from.emailAddress : {};
+  var r = await fetch(GRAPH + '/me/messages', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      subject: `Re: ${email.subject||''}`,
+      subject: 'Re: ' + (email.subject || ''),
       body: { contentType: 'Text', content: text },
-      toRecipients: [{ emailAddress: email.from?.emailAddress }],
+      toRecipients: [{ emailAddress: toAddr }],
       isDraft: true
     })
   });
-  const d = await r.json();
+  var d = await r.json();
   if (d.error) throw new Error(d.error.message);
 }
 
 async function regenerate(id) {
-  const apiKey = sessionStorage.getItem('anthropic_key');
+  var apiKey = sessionStorage.getItem('anthropic_key');
   if (!apiKey) return;
-  const email = emails.find(e=>e.id===id);
-  const body = email.body?.contentType==='html' ? stripHtml(email.body.content) : (email.body?.content||email.bodyPreview||'');
+  var email = null;
+  for (var i = 0; i < emails.length; i++) { if (emails[i].id === id) { email = emails[i]; break; } }
+  if (!email) return;
+  var body = email.body && email.body.contentType === 'html' ? stripHtml(email.body.content) : (email.body && email.body.content ? email.body.content : email.bodyPreview || '');
   setStatus(id, 'writing', '✍️ Writing…');
-  document.getElementById(`draft-${id}`).value = '';
+  var ta = document.getElementById('draft-' + id);
+  if (ta) ta.value = '';
   try {
-    const text = await callClaude(apiKey, email, body);
-    document.getElementById(`draft-${id}`).value = text;
-    drafts[id] = { text, saved: false };
+    var text = await callClaude(apiKey, email, body);
+    if (ta) ta.value = text;
+    drafts[id] = { saved: false };
     setStatus(id, 'ready', '✅ Ready');
   } catch(e) {
     setStatus(id, 'error', '❌ Error');
@@ -402,28 +411,30 @@ async function regenerate(id) {
 }
 
 function copySingle(id) {
-  navigator.clipboard.writeText(document.getElementById(`draft-${id}`)?.value||'');
-  document.getElementById(`save-msg-${id}`).innerHTML = '<span class="ok">📋 Copied!</span>';
+  var ta = document.getElementById('draft-' + id);
+  if (ta) navigator.clipboard.writeText(ta.value);
+  var msg = document.getElementById('save-msg-' + id);
+  if (msg) msg.innerHTML = '<span class="ok">📋 Copied!</span>';
 }
 
 function toggleBody(id) {
-  const el = document.getElementById(`body-${id}`);
-  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  var el = document.getElementById('body-' + id);
+  if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
 
 function setStatus(id, type, label) {
-  const el = document.getElementById(`status-${id}`);
+  var el = document.getElementById('status-' + id);
   if (!el) return;
-  el.className = `draft-status status-${type}`;
+  el.className = 'draft-status status-' + type;
   el.textContent = label;
 }
 
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const stripHtml = h => h.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim();
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function stripHtml(h) { return h.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim(); }
 function fmtDate(d) {
   if (!d) return '';
-  const dt = new Date(d), now = new Date();
-  return dt.toDateString()===now.toDateString() ? dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : dt.toLocaleDateString([],{month:'short',day:'numeric'});
+  var dt = new Date(d), now = new Date();
+  return dt.toDateString() === now.toDateString() ? dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : dt.toLocaleDateString([],{month:'short',day:'numeric'});
 }
 
 handleRedirect();

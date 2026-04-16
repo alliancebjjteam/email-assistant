@@ -288,7 +288,7 @@ async function callClaude(apiKey, email, body) {
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
       max_tokens: 1000,
       messages: [{ role: 'user', content: `Draft a professional, friendly email reply on behalf of Sergio Rubio Landero, General Manager of Alliance Jiu Jitsu Vancouver, Canada. Be concise. Write only the email body — no subject or headers. Sign off as Sergio.\n\nFrom: ${email.from?.emailAddress?.name||''} <${email.from?.emailAddress?.address||''}>\nSubject: ${email.subject||''}\nMessage:\n${body}\n\nWrite the reply:` }]
     })

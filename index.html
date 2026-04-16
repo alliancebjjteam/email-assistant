@@ -64,6 +64,16 @@ textarea:focus { outline: none; border-color: #1e3a5f; }
     <p style="font-size:12px;color:#9ca3af;margin-top:16px">Permissions: Mail.Read · Mail.ReadWrite (drafts only)</p>
   </div>
 
+  <!-- API KEY BAR -->
+  <div id="api-bar" class="card" style="display:none;padding:12px 16px;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <label style="font-size:13px;font-weight:600;color:#374151;">🔑 Anthropic API Key:</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." style="flex:1;min-width:200px;margin:0;padding:8px 12px;" />
+      <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save</button>
+      <span id="api-key-msg" class="msg" style="margin:0"></span>
+    </div>
+  </div>
+
   <!-- MAIN -->
   <div id="main-view">
     <div class="two-col">
@@ -150,7 +160,7 @@ function handleRedirect() {
 async function showMain() {
   document.getElementById('login-view').style.display = 'none';
   document.getElementById('main-view').style.display = 'block';
-  document.getElementById('signout').style.display = 'inline-block';
+  document.getElementById('api-bar').style.display = 'block';
   try {
     const r = await fetch(`${GRAPH}/me`, { headers: { Authorization: `Bearer ${token}` } });
     const u = await r.json();
@@ -214,9 +224,11 @@ async function generateDraft() {
   document.getElementById('draft-text').value = '';
   document.getElementById('draft-msg').innerHTML = '<span class="spinner"></span> Claude is writing…';
   try {
+    const apiKey = sessionStorage.getItem('anthropic_key');
+    if (!apiKey) { document.getElementById('draft-msg').innerHTML = '<span class="err">Please enter your Anthropic API key in the field above the inbox.</span>'; return; }
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -266,6 +278,15 @@ function fmtDate(d) {
   if (!d) return '';
   const dt = new Date(d), now = new Date();
   return dt.toDateString()===now.toDateString() ? dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : dt.toLocaleDateString([],{month:'short',day:'numeric'});
+}
+
+function saveApiKey() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (!k) return;
+  sessionStorage.setItem('anthropic_key', k);
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-key-msg').innerHTML = '<span class="ok">✅ Saved!</span>';
+  setTimeout(() => document.getElementById('api-key-msg').innerHTML = '', 2000);
 }
 
 handleRedirect();

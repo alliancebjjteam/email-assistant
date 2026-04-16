@@ -11,44 +11,56 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .header h1 { font-size: 18px; font-weight: 700; }
 #user-bar { font-size: 13px; color: #cbd5e1; margin-left: auto; margin-right: 12px; }
 #signout { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: none; }
-.container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+.container { max-width: 1100px; margin: 0 auto; padding: 20px 16px; }
 .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .btn { padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
 .btn-primary { background: #1e3a5f; color: white; }
 .btn-primary:hover { background: #162d4a; }
 .btn-secondary { background: #e5e7eb; color: #374151; }
 .btn-success { background: #059669; color: white; }
+.btn-danger { background: #dc2626; color: white; }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
-.two-col { display: grid; grid-template-columns: 300px 1fr; gap: 16px; }
-@media(max-width:660px) { .two-col { grid-template-columns: 1fr; } }
-.email-item { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; }
-.email-item:hover { border-color: #1e3a5f; background: #f0f4ff; }
-.email-item.active { border-color: #1e3a5f; background: #e8f0fe; }
-.e-sender { font-weight: 700; font-size: 12px; }
-.e-subject { font-size: 13px; margin: 3px 0; }
-.e-preview { font-size: 11px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.e-date { font-size: 11px; color: #9ca3af; float: right; }
-.thread-body { background: #f9fafb; border-radius: 8px; padding: 14px; font-size: 13px; line-height: 1.7; color: #374151; white-space: pre-wrap; max-height: 200px; overflow-y: auto; margin-bottom: 14px; }
-textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 160px; margin-bottom: 10px; }
-textarea:focus { outline: none; border-color: #1e3a5f; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.msg { font-size: 12px; margin-top: 8px; }
+input, textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; font-family: inherit; }
+input:focus, textarea:focus { outline: none; border-color: #1e3a5f; }
+textarea { resize: vertical; min-height: 120px; margin-top: 8px; }
+.msg { font-size: 12px; margin-top: 6px; }
 .ok { color: #059669; } .err { color: #dc2626; }
-.sec-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-.spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #e5e7eb; border-top-color: #1e3a5f; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #1e3a5f; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
+.spinner-lg { width: 32px; height: 32px; border-width: 3px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-#login-view { text-align: center; padding: 50px 20px; }
+#login-view { text-align: center; padding: 60px 20px; }
 #login-view p { color: #6b7280; font-size: 14px; margin: 12px 0 24px; }
 #main-view { display: none; }
-#composer { display: none; }
-#select-prompt { text-align: center; padding: 40px; color: #9ca3af; }
+.api-bar { padding: 12px 16px; display: none; }
+.api-bar-inner { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.email-draft-item { border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+.email-draft-header { padding: 14px 16px; background: #f9fafb; display: flex; justify-content: space-between; align-items: flex-start; cursor: pointer; }
+.email-draft-header:hover { background: #f0f4ff; }
+.email-meta { flex: 1; }
+.email-sender { font-weight: 700; font-size: 13px; }
+.email-subject { font-size: 14px; font-weight: 600; margin: 3px 0; }
+.email-preview { font-size: 12px; color: #9ca3af; }
+.email-date { font-size: 11px; color: #9ca3af; white-space: nowrap; margin-left: 12px; }
+.draft-status { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-writing { background: #dbeafe; color: #1e40af; }
+.status-ready { background: #d1fae5; color: #065f46; }
+.status-saved { background: #e0e7ff; color: #3730a3; }
+.status-error { background: #fee2e2; color: #991b1b; }
+.draft-body { padding: 16px; border-top: 1px solid #e5e7eb; display: none; }
+.original-body { background: #f9fafb; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.6; color: #555; max-height: 150px; overflow-y: auto; white-space: pre-wrap; margin-bottom: 12px; }
+.draft-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.progress-bar-wrap { background: #e5e7eb; border-radius: 99px; height: 6px; margin: 8px 0; }
+.progress-bar { background: #1e3a5f; height: 6px; border-radius: 99px; transition: width 0.4s; }
+.top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.count-badge { background: #dbeafe; color: #1e40af; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 99px; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <span>📧</span>
-  <h1>Email Draft Assistant</h1>
+  <h1>Email Draft Assistant — Alliance BJJ Vancouver</h1>
   <span id="user-bar"></span>
   <button id="signout" onclick="signOut()">Sign out</button>
 </div>
@@ -59,86 +71,70 @@ textarea:focus { outline: none; border-color: #1e3a5f; }
   <div id="login-view" class="card">
     <div style="font-size:48px;margin-bottom:16px">🔐</div>
     <h2 style="font-size:20px;font-weight:700">Connect your Outlook / Hotmail</h2>
-    <p>Sign in with your Microsoft account. We only read your inbox and save drafts — nothing is ever sent automatically.</p>
+    <p>Sign in with Microsoft. We read your unread emails, generate replies with Claude, and save them to your Drafts — nothing is ever sent automatically.</p>
     <button class="btn btn-primary" style="font-size:15px;padding:12px 32px" onclick="signIn()">Sign in with Microsoft</button>
     <p style="font-size:12px;color:#9ca3af;margin-top:16px">Permissions: Mail.Read · Mail.ReadWrite (drafts only)</p>
   </div>
 
   <!-- API KEY BAR -->
-  <div id="api-bar" class="card" style="display:none;padding:12px 16px;">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <label style="font-size:13px;font-weight:600;color:#374151;">🔑 Anthropic API Key:</label>
-      <input type="password" id="api-key-input" placeholder="sk-ant-..." style="flex:1;min-width:200px;margin:0;padding:8px 12px;" />
+  <div class="card api-bar" id="api-bar">
+    <div class="api-bar-inner">
+      <label style="font-size:13px;font-weight:600">🔑 Anthropic API Key:</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." style="flex:1;min-width:200px;" />
       <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save</button>
-      <span id="api-key-msg" class="msg" style="margin:0"></span>
+      <span id="api-key-msg" class="msg"></span>
     </div>
   </div>
 
   <!-- MAIN -->
   <div id="main-view">
-    <div class="two-col">
-      <div>
-        <div class="card" style="padding:14px">
-          <div class="sec-title">
-            📬 Inbox
-            <button class="btn btn-secondary btn-sm" onclick="loadEmails()">↻ Refresh</button>
-          </div>
-          <div id="email-list"><p style="color:#9ca3af;font-size:13px">Loading…</p></div>
+    <div class="card" style="padding:16px">
+      <div class="top-actions">
+        <div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px">📬 Unread Emails</div>
+          <div id="summary-line" style="font-size:13px;color:#6b7280"></div>
+        </div>
+        <span id="count-badge" class="count-badge" style="display:none"></span>
+        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="loadAndDraftAll()">↻ Refresh & Re-draft</button>
+          <button class="btn btn-success" id="save-all-btn" onclick="saveAllDrafts()" style="display:none">💾 Save All to Drafts</button>
         </div>
       </div>
-      <div>
-        <div id="select-prompt" class="card">
-          <div style="font-size:32px;margin-bottom:10px">👈</div>
-          Select an email to draft a reply
-        </div>
-        <div id="composer" class="card">
-          <div style="margin-bottom:12px">
-            <div id="comp-subject" style="font-size:16px;font-weight:700"></div>
-            <div id="comp-from" style="font-size:12px;color:#6b7280;margin-top:4px"></div>
-          </div>
-          <div id="comp-body" class="thread-body"></div>
-          <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">✍️ Draft Reply</div>
-          <div id="draft-msg" class="msg" style="margin-bottom:6px"></div>
-          <textarea id="draft-text" placeholder="Click Generate Draft to let Claude write a reply…"></textarea>
-          <div class="actions">
-            <button class="btn btn-primary" onclick="generateDraft()">✨ Generate Draft</button>
-            <button class="btn btn-success" onclick="saveDraft()">💾 Save to Drafts</button>
-            <button class="btn btn-secondary" onclick="copyDraft()">📋 Copy</button>
-          </div>
-          <div id="save-msg" class="msg"></div>
-        </div>
+      <div id="progress-wrap" style="display:none">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+        <div id="progress-label" style="font-size:12px;color:#6b7280;margin-top:4px"></div>
       </div>
+      <div id="drafts-list"></div>
     </div>
   </div>
 
 </div>
 
 <script>
-// ── CONFIG — update YOUR_GITHUB_USERNAME below ──
 const CLIENT_ID = '620d262f-aa0c-439f-9d80-861aacedcd16';
 const TENANT_ID = '93cd4715-1f49-4fc3-86ca-70e33112d62b';
 const REDIRECT_URI = 'https://alliancebjjteam.github.io/email-assistant/';
 const SCOPES = 'Mail.Read Mail.ReadWrite';
 const GRAPH = 'https://graph.microsoft.com/v1.0';
-let token = null, currentEmail = null;
+let token = null;
+let emails = [];
+let drafts = {}; // id -> {text, status}
 
 function signIn() {
   const p = new URLSearchParams({
-    client_id: CLIENT_ID,
-    response_type: 'token',
-    redirect_uri: REDIRECT_URI,
-    scope: SCOPES,
-    response_mode: 'fragment',
-    prompt: 'select_account'
+    client_id: CLIENT_ID, response_type: 'token',
+    redirect_uri: REDIRECT_URI, scope: SCOPES,
+    response_mode: 'fragment', prompt: 'select_account'
   });
   window.location.href = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/authorize?${p}`;
 }
 
 function signOut() {
   token = null;
-  sessionStorage.removeItem('ms_token');
+  sessionStorage.clear();
   document.getElementById('login-view').style.display = 'block';
   document.getElementById('main-view').style.display = 'none';
+  document.getElementById('api-bar').style.display = 'none';
   document.getElementById('signout').style.display = 'none';
   document.getElementById('user-bar').textContent = '';
 }
@@ -150,8 +146,7 @@ function handleRedirect() {
     token = t;
     sessionStorage.setItem('ms_token', t);
     history.replaceState(null, '', window.location.pathname);
-    showMain();
-    return;
+    showMain(); return;
   }
   const saved = sessionStorage.getItem('ms_token');
   if (saved) { token = saved; showMain(); }
@@ -161,123 +156,17 @@ async function showMain() {
   document.getElementById('login-view').style.display = 'none';
   document.getElementById('main-view').style.display = 'block';
   document.getElementById('api-bar').style.display = 'block';
+  document.getElementById('signout').style.display = 'inline-block';
+  const saved = sessionStorage.getItem('anthropic_key');
+  if (saved) {
+    document.getElementById('api-key-msg').innerHTML = '<span class="ok">✅ API key loaded</span>';
+  }
   try {
     const r = await fetch(`${GRAPH}/me`, { headers: { Authorization: `Bearer ${token}` } });
     const u = await r.json();
     document.getElementById('user-bar').textContent = u.displayName || u.mail || '';
   } catch(e) {}
-  loadEmails();
-}
-
-async function loadEmails() {
-  document.getElementById('email-list').innerHTML = '<span class="spinner"></span> Loading…';
-  try {
-    const r = await fetch(`${GRAPH}/me/mailFolders/inbox/messages?$top=20&$select=id,subject,from,receivedDateTime,bodyPreview,isRead&$orderby=receivedDateTime desc`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error.message);
-    renderList(d.value || []);
-  } catch(e) {
-    document.getElementById('email-list').innerHTML = `<span class="err">Error: ${e.message}</span>`;
-  }
-}
-
-function renderList(emails) {
-  if (!emails.length) { document.getElementById('email-list').innerHTML = '<p style="color:#9ca3af;font-size:13px">No emails.</p>'; return; }
-  document.getElementById('email-list').innerHTML = emails.map(e => `
-    <div class="email-item" onclick="selectEmail('${e.id}',this)">
-      <span class="e-date">${fmtDate(e.receivedDateTime)}</span>
-      <div class="e-sender">${esc(e.from?.emailAddress?.name||e.from?.emailAddress?.address||'?')}</div>
-      <div class="e-subject" style="${!e.isRead?'font-weight:700':''}">${esc(e.subject||'(no subject)')}</div>
-      <div class="e-preview">${esc(e.bodyPreview||'')}</div>
-    </div>`).join('');
-}
-
-async function selectEmail(id, el) {
-  document.querySelectorAll('.email-item').forEach(x => x.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('select-prompt').style.display = 'none';
-  document.getElementById('composer').style.display = 'block';
-  document.getElementById('comp-body').textContent = 'Loading…';
-  document.getElementById('draft-text').value = '';
-  document.getElementById('draft-msg').innerHTML = '';
-  document.getElementById('save-msg').innerHTML = '';
-  try {
-    const r = await fetch(`${GRAPH}/me/messages/${id}?$select=id,subject,from,receivedDateTime,body,bodyPreview`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const email = await r.json();
-    if (email.error) throw new Error(email.error.message);
-    currentEmail = email;
-    document.getElementById('comp-subject').textContent = email.subject || '(no subject)';
-    document.getElementById('comp-from').textContent = `From: ${email.from?.emailAddress?.name||''} <${email.from?.emailAddress?.address||''}>`;
-    document.getElementById('comp-body').textContent = email.body?.contentType==='html' ? stripHtml(email.body.content) : (email.body?.content||email.bodyPreview||'');
-  } catch(e) {
-    document.getElementById('comp-body').textContent = 'Error: ' + e.message;
-  }
-}
-
-async function generateDraft() {
-  if (!currentEmail) return;
-  const body = currentEmail.body?.contentType==='html' ? stripHtml(currentEmail.body.content) : (currentEmail.body?.content||currentEmail.bodyPreview||'');
-  document.getElementById('draft-text').value = '';
-  document.getElementById('draft-msg').innerHTML = '<span class="spinner"></span> Claude is writing…';
-  try {
-    const apiKey = sessionStorage.getItem('anthropic_key');
-    if (!apiKey) { document.getElementById('draft-msg').innerHTML = '<span class="err">Please enter your Anthropic API key in the field above the inbox.</span>'; return; }
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: `Draft a professional, friendly email reply on behalf of Sergio Rubio Landero, General Manager of Alliance Jiu Jitsu Vancouver, Canada. Be concise. Write only the email body — no subject or headers. Sign off as Sergio.\n\nFrom: ${currentEmail.from?.emailAddress?.name||''} <${currentEmail.from?.emailAddress?.address||''}>\nSubject: ${currentEmail.subject||''}\nMessage:\n${body}\n\nWrite the reply:` }]
-      })
-    });
-    const data = await res.json();
-    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    document.getElementById('draft-text').value = text.trim();
-    document.getElementById('draft-msg').innerHTML = '<span class="ok">✅ Draft ready — review and edit before sending.</span>';
-  } catch(e) {
-    document.getElementById('draft-msg').innerHTML = `<span class="err">Error: ${e.message}</span>`;
-  }
-}
-
-async function saveDraft() {
-  const text = document.getElementById('draft-text').value.trim();
-  if (!text) { document.getElementById('save-msg').innerHTML = '<span class="err">Draft is empty.</span>'; return; }
-  document.getElementById('save-msg').innerHTML = '<span style="color:#6b7280">Saving…</span>';
-  try {
-    const r = await fetch(`${GRAPH}/me/messages`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subject: `Re: ${currentEmail.subject||''}`,
-        body: { contentType: 'Text', content: text },
-        toRecipients: [{ emailAddress: currentEmail.from?.emailAddress }],
-        isDraft: true
-      })
-    });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error.message);
-    document.getElementById('save-msg').innerHTML = '<span class="ok">✅ Saved to Drafts! Open Outlook to review and send.</span>';
-  } catch(e) {
-    document.getElementById('save-msg').innerHTML = `<span class="err">Error: ${e.message}</span>`;
-  }
-}
-
-function copyDraft() {
-  navigator.clipboard.writeText(document.getElementById('draft-text').value||'');
-  document.getElementById('save-msg').innerHTML = '<span class="ok">📋 Copied!</span>';
-}
-
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const stripHtml = h => h.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim();
-function fmtDate(d) {
-  if (!d) return '';
-  const dt = new Date(d), now = new Date();
-  return dt.toDateString()===now.toDateString() ? dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : dt.toLocaleDateString([],{month:'short',day:'numeric'});
+  loadAndDraftAll();
 }
 
 function saveApiKey() {
@@ -286,7 +175,217 @@ function saveApiKey() {
   sessionStorage.setItem('anthropic_key', k);
   document.getElementById('api-key-input').value = '';
   document.getElementById('api-key-msg').innerHTML = '<span class="ok">✅ Saved!</span>';
-  setTimeout(() => document.getElementById('api-key-msg').innerHTML = '', 2000);
+}
+
+async function loadAndDraftAll() {
+  drafts = {};
+  document.getElementById('drafts-list').innerHTML = '<div style="text-align:center;padding:40px;color:#6b7280"><span class="spinner spinner-lg"></span><br><br>Loading unread emails…</div>';
+  document.getElementById('save-all-btn').style.display = 'none';
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('summary-line').textContent = '';
+  document.getElementById('count-badge').style.display = 'none';
+
+  try {
+    const r = await fetch(`${GRAPH}/me/mailFolders/inbox/messages?$top=20&$filter=isRead eq false&$select=id,subject,from,receivedDateTime,bodyPreview,body,isRead&$orderby=receivedDateTime desc`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    emails = d.value || [];
+
+    if (!emails.length) {
+      document.getElementById('drafts-list').innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af"><div style="font-size:32px;margin-bottom:10px">🎉</div>No unread emails!</div>';
+      document.getElementById('summary-line').textContent = 'All caught up!';
+      return;
+    }
+
+    document.getElementById('count-badge').textContent = `${emails.length} unread`;
+    document.getElementById('count-badge').style.display = 'inline-block';
+    document.getElementById('summary-line').textContent = `Generating drafts for ${emails.length} unread email${emails.length>1?'s':''}…`;
+
+    // render all cards as pending
+    renderAllCards();
+
+    // start drafting all
+    await draftAll();
+
+  } catch(e) {
+    document.getElementById('drafts-list').innerHTML = `<div class="err" style="padding:16px">Error: ${e.message}</div>`;
+  }
+}
+
+function renderAllCards() {
+  document.getElementById('drafts-list').innerHTML = emails.map(e => `
+    <div class="email-draft-item" id="item-${e.id}">
+      <div class="email-draft-header" onclick="toggleBody('${e.id}')">
+        <div class="email-meta">
+          <div class="email-sender">${esc(e.from?.emailAddress?.name||e.from?.emailAddress?.address||'?')}</div>
+          <div class="email-subject">${esc(e.subject||'(no subject)')}</div>
+          <div class="email-preview">${esc(e.bodyPreview||'')}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <span class="email-date">${fmtDate(e.receivedDateTime)}</span>
+          <span class="draft-status status-pending" id="status-${e.id}">⏳ Pending</span>
+        </div>
+      </div>
+      <div class="draft-body" id="body-${e.id}">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Original Email</div>
+        <div class="original-body" id="orig-${e.id}"></div>
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;margin-top:12px">✍️ Draft Reply</div>
+        <textarea id="draft-${e.id}" placeholder="Generating…"></textarea>
+        <div class="draft-actions">
+          <button class="btn btn-success btn-sm" onclick="saveSingleDraft('${e.id}')">💾 Save to Drafts</button>
+          <button class="btn btn-secondary btn-sm" onclick="copySingle('${e.id}')">📋 Copy</button>
+          <button class="btn btn-primary btn-sm" onclick="regenerate('${e.id}')">↻ Regenerate</button>
+        </div>
+        <div id="save-msg-${e.id}" class="msg"></div>
+      </div>
+    </div>`).join('');
+}
+
+async function draftAll() {
+  const apiKey = sessionStorage.getItem('anthropic_key');
+  if (!apiKey) {
+    document.getElementById('summary-line').innerHTML = '<span class="err">⚠️ Please enter your Anthropic API key above first.</span>';
+    return;
+  }
+
+  document.getElementById('progress-wrap').style.display = 'block';
+  let done = 0;
+
+  for (const email of emails) {
+    setStatus(email.id, 'writing', '✍️ Writing…');
+    const body = email.body?.contentType==='html' ? stripHtml(email.body.content) : (email.body?.content||email.bodyPreview||'');
+    document.getElementById(`orig-${email.id}`).textContent = body;
+
+    try {
+      const text = await callClaude(apiKey, email, body);
+      document.getElementById(`draft-${email.id}`).value = text;
+      drafts[email.id] = { text, saved: false };
+      setStatus(email.id, 'ready', '✅ Ready');
+    } catch(e) {
+      setStatus(email.id, 'error', '❌ Error');
+      document.getElementById(`draft-${email.id}`).value = 'Error generating draft: ' + e.message;
+    }
+
+    done++;
+    const pct = Math.round((done/emails.length)*100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = `${done} of ${emails.length} drafted`;
+  }
+
+  document.getElementById('summary-line').textContent = `${emails.length} draft${emails.length>1?'s':''} ready — review and save!`;
+  document.getElementById('save-all-btn').style.display = 'inline-block';
+}
+
+async function callClaude(apiKey, email, body) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: `Draft a professional, friendly email reply on behalf of Sergio Rubio Landero, General Manager of Alliance Jiu Jitsu Vancouver, Canada. Be concise. Write only the email body — no subject or headers. Sign off as Sergio.\n\nFrom: ${email.from?.emailAddress?.name||''} <${email.from?.emailAddress?.address||''}>\nSubject: ${email.subject||''}\nMessage:\n${body}\n\nWrite the reply:` }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+  return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+}
+
+async function saveAllDrafts() {
+  let saved = 0;
+  for (const email of emails) {
+    const text = document.getElementById(`draft-${email.id}`)?.value?.trim();
+    if (!text || drafts[email.id]?.saved) continue;
+    try {
+      await saveToOutlook(email, text);
+      drafts[email.id].saved = true;
+      setStatus(email.id, 'saved', '💾 Saved');
+      saved++;
+    } catch(e) {
+      setStatus(email.id, 'error', '❌ Error');
+    }
+  }
+  document.getElementById('summary-line').textContent = `✅ ${saved} draft${saved!==1?'s':''} saved to your Outlook Drafts folder!`;
+}
+
+async function saveSingleDraft(id) {
+  const email = emails.find(e=>e.id===id);
+  const text = document.getElementById(`draft-${id}`)?.value?.trim();
+  const msg = document.getElementById(`save-msg-${id}`);
+  if (!text) { msg.innerHTML = '<span class="err">Draft is empty.</span>'; return; }
+  msg.innerHTML = '<span style="color:#6b7280">Saving…</span>';
+  try {
+    await saveToOutlook(email, text);
+    drafts[id] = { ...(drafts[id]||{}), saved: true };
+    setStatus(id, 'saved', '💾 Saved');
+    msg.innerHTML = '<span class="ok">✅ Saved to Outlook Drafts!</span>';
+  } catch(e) {
+    msg.innerHTML = `<span class="err">Error: ${e.message}</span>`;
+  }
+}
+
+async function saveToOutlook(email, text) {
+  const r = await fetch(`${GRAPH}/me/messages`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      subject: `Re: ${email.subject||''}`,
+      body: { contentType: 'Text', content: text },
+      toRecipients: [{ emailAddress: email.from?.emailAddress }],
+      isDraft: true
+    })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+}
+
+async function regenerate(id) {
+  const apiKey = sessionStorage.getItem('anthropic_key');
+  if (!apiKey) return;
+  const email = emails.find(e=>e.id===id);
+  const body = email.body?.contentType==='html' ? stripHtml(email.body.content) : (email.body?.content||email.bodyPreview||'');
+  setStatus(id, 'writing', '✍️ Writing…');
+  document.getElementById(`draft-${id}`).value = '';
+  try {
+    const text = await callClaude(apiKey, email, body);
+    document.getElementById(`draft-${id}`).value = text;
+    drafts[id] = { text, saved: false };
+    setStatus(id, 'ready', '✅ Ready');
+  } catch(e) {
+    setStatus(id, 'error', '❌ Error');
+  }
+}
+
+function copySingle(id) {
+  navigator.clipboard.writeText(document.getElementById(`draft-${id}`)?.value||'');
+  document.getElementById(`save-msg-${id}`).innerHTML = '<span class="ok">📋 Copied!</span>';
+}
+
+function toggleBody(id) {
+  const el = document.getElementById(`body-${id}`);
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function setStatus(id, type, label) {
+  const el = document.getElementById(`status-${id}`);
+  if (!el) return;
+  el.className = `draft-status status-${type}`;
+  el.textContent = label;
+}
+
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const stripHtml = h => h.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim();
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d), now = new Date();
+  return dt.toDateString()===now.toDateString() ? dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : dt.toLocaleDateString([],{month:'short',day:'numeric'});
 }
 
 handleRedirect();

@@ -236,7 +236,7 @@ async function generateDraft() {
       })
     });
     const data = await res.json();
-    const text = data.content?.map(b=>b.text||'').join('')||'';
+    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
     document.getElementById('draft-text').value = text.trim();
     document.getElementById('draft-msg').innerHTML = '<span class="ok">✅ Draft ready — review and edit before sending.</span>';
   } catch(e) {
@@ -273,7 +273,7 @@ function copyDraft() {
 }
 
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const stripHtml = h => h.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim();
+const stripHtml = h => h.replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&quot;/gi,'"').replace(/<[^>]+>/g,' ').replace(/\s{2,}/g,' ').trim();
 function fmtDate(d) {
   if (!d) return '';
   const dt = new Date(d), now = new Date();

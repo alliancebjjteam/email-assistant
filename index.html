@@ -83,6 +83,27 @@ textarea { resize: vertical; min-height: 120px; margin-top: 8px; }
       <input type="password" id="api-key-input" placeholder="sk-ant-..." style="flex:1;min-width:200px;" />
       <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save</button>
       <span id="api-key-msg" class="msg"></span>
+      <button class="btn btn-secondary btn-sm" onclick="toggleMemory()">🧠 My Info</button>
+    </div>
+  </div>
+
+  <!-- MEMORY PANEL -->
+  <div class="card" id="memory-panel" style="display:none">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">🧠 My Info — Claude uses this when drafting every reply</div>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Add anything: gym hours, pricing, programs, policies, tone preferences, FAQs. The more detail, the better the drafts.</p>
+    <textarea id="memory-text" rows="10" placeholder="Example:
+- Gym address: 123 Main St, Vancouver BC
+- Hours: Mon-Fri 6am-10pm, Sat-Sun 8am-6pm
+- Adult membership: $180/mo, Kids: $150/mo
+- Free trial: first class free
+- Cancellation policy: 30 days written notice
+- Membership pause: up to 3 months/year
+- Always be warm and welcoming
+- Never offer discounts without manager approval"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-primary btn-sm" onclick="saveMemory()">💾 Save Info</button>
+      <button class="btn btn-secondary btn-sm" onclick="toggleMemory()">Close</button>
+      <span id="memory-msg" class="msg" style="align-self:center"></span>
     </div>
   </div>
 
@@ -169,7 +190,22 @@ async function showMain() {
   loadAndDraftAll();
 }
 
-function saveApiKey() {
+function toggleMemory() {
+  const p = document.getElementById('memory-panel');
+  const isOpen = p.style.display === 'block';
+  p.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    const saved = localStorage.getItem('gym_memory');
+    if (saved) document.getElementById('memory-text').value = saved;
+  }
+}
+
+function saveMemory() {
+  const val = document.getElementById('memory-text').value.trim();
+  localStorage.setItem('gym_memory', val);
+  document.getElementById('memory-msg').innerHTML = '<span class="ok">✅ Saved!</span>';
+  setTimeout(() => document.getElementById('memory-msg').innerHTML = '', 2000);
+}
   const k = document.getElementById('api-key-input').value.trim();
   if (!k) return;
   sessionStorage.setItem('anthropic_key', k);
@@ -279,6 +315,8 @@ async function draftAll() {
 }
 
 async function callClaude(apiKey, email, body) {
+  const memory = localStorage.getItem('gym_memory') || '';
+  const memoryBlock = memory ? `\n\nContext about Alliance BJJ Vancouver (use this to answer accurately):\n${memory}` : '';
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -290,7 +328,7 @@ async function callClaude(apiKey, email, body) {
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
       max_tokens: 1000,
-      messages: [{ role: 'user', content: `Draft a professional, friendly email reply on behalf of Sergio Rubio Landero, General Manager of Alliance Jiu Jitsu Vancouver, Canada. Be concise. Write only the email body — no subject or headers. Sign off as Sergio.\n\nFrom: ${email.from?.emailAddress?.name||''} <${email.from?.emailAddress?.address||''}>\nSubject: ${email.subject||''}\nMessage:\n${body}\n\nWrite the reply:` }]
+      messages: [{ role: 'user', content: `Draft a professional, friendly email reply on behalf of Sergio Rubio Landero, General Manager of Alliance Jiu Jitsu Vancouver, Canada. Be concise. Write only the email body — no subject or headers. Sign off as Sergio.${memoryBlock}\n\nFrom: ${email.from?.emailAddress?.name||''} <${email.from?.emailAddress?.address||''}>\nSubject: ${email.subject||''}\nMessage:\n${body}\n\nWrite the reply:` }]
     })
   });
   const data = await res.json();
